@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Budget App</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        #app {
+            max-width: 400px; /* Typical mobile width */
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+        .section-title {
+            font-size: 1.2em;
+            color: #0056b3;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #28a745;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .money-left-over {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6ffed;
+            border-radius: 8px;
+        }
+
+        /* Basic Pie Chart Styling (using CSS gradients for simplicity) */
+        .pie-chart-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #007bff 0% 54.54%, /* Housing: 1500/2750 = 54.54% */
+                #28a745 54.54% 72.73%, /* Groceries: 500/2750 = 18.18% (54.54+18.18 = 72.72) */
+                #6c757d 72.73% 83.63%, /* Transportation: 300/2750 = 10.90% (72.73+10.90 = 83.63) */
+                #ffc107 83.63% 90.90%, /* Utilities: 200/2750 = 7.27% (83.63+7.27 = 90.90) */
+                #dc3545 90.90% 96.36%, /* Dining: 150/2750 = 5.45% (90.90+5.45 = 96.35) */
+                #e83e8c 96.36% 100% /* Education: 100/2750 = 3.63% (96.36+3.63 = 99.99) */
+            );
+        }
+
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 10px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h2>Budget Overview</h2>
+
+        <div class="section">
+            <div class="section-title">Money In</div>
+            <div class="item">
+                <span>Paycheck</span>
+                <span>THB {{ moneyIn.paycheck.toLocaleString() }}</span>
+            </div>
+            <div class="item">
+                <span>Additional income</span>
+                <span>THB {{ moneyIn.additionalIncome.toLocaleString() }}</span>
+            </div>
+            <div class="total">
+                <span>Total income</span>
+                <span>THB {{ totalIncome.toLocaleString() }}</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Money Out</div>
+            <div class="pie-chart-container">
+                <div class="pie-chart"></div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: #007bff;"></span>
+                    <span>Housing (Rent, mortgage, taxes, insurance)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: #28a745;"></span>
+                    <span>Groceries</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: #6c757d;"></span>
+                    <span>Transportation</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: #ffc107;"></span>
+                    <span>Utilities</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: #dc3545;"></span>
+                    <span>Dining, travel, entertainment</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: #e83e8c;"></span>
+                    <span>Education</span>
+                </div>
+            </div>
+
+            <div class="item">
+                <span>Housing (Rent, mortgage, taxes, insurance)</span>
+                <span>THB {{ moneyOut.housing.toLocaleString() }}</span>
+            </div>
+            <div class="item">
+                <span>Groceries</span>
+                <span>THB {{ moneyOut.groceries.toLocaleString() }}</span>
+            </div>
+            <div class="item">
+                <span>Transportation</span>
+                <span>THB {{ moneyOut.transportation.toLocaleString() }}</span>
+            </div>
+            <div class="item">
+                <span>Utilities</span>
+                <span>THB {{ moneyOut.utilities.toLocaleString() }}</span>
+            </div>
+            <div class="item">
+                <span>Dining, travel, entertainment</span>
+                <span>THB {{ moneyOut.diningTravelEntertainment.toLocaleString() }}</span>
+            </div>
+            <div class="item">
+                <span>Education</span>
+                <span>THB {{ moneyOut.education.toLocaleString() }}</span>
+            </div>
+            <div class="total">
+                <span>Total expenses</span>
+                <span>THB {{ totalExpenses.toLocaleString() }}</span>
+            </div>
+        </div>
+
+        <div class="section money-left-over">
+            <span>Money Left Over:</span>
+            <span>THB {{ moneyLeftOver.toLocaleString() }}</span>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                moneyIn: {
+                    paycheck: 4000,
+                    additionalIncome: 0
+                },
+                moneyOut: {
+                    housing: 1500,
+                    groceries: 500,
+                    transportation: 300,
+                    utilities: 200,
+                    diningTravelEntertainment: 150,
+                    education: 100
+                }
+            },
+            computed: {
+                totalIncome() {
+                    return this.moneyIn.paycheck + this.moneyIn.additionalIncome;
+                },
+                totalExpenses() {
+                    return Object.values(this.moneyOut).reduce((sum, value) => sum + value, 0);
+                },
+                moneyLeftOver() {
+                    return this.totalIncome - this.totalExpenses;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
